@@ -1,0 +1,22 @@
+1. For each word in tweet:
+	find if word is positive or negative:
+		if found:
+			assign p or n with the word
+
+	seed_word,p/n
+
+	for rest of the words in tweet after seed_word:
+		calculate bi grams i bigram_arr
+		for each bigrams in bigram_arr:
+			textblob(sentiment)
+			majority of pos/neg scores for each bigram
+
+	majority = pos/neg
+
+	from p it it changed to neg - sarcasm
+	from n it changed to pos - sarcasm
+
+	else
+	 non sarcasm
+	 
+
