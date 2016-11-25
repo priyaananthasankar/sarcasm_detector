@@ -19,6 +19,7 @@ nsp = 0
 nsn = 0
 
 def pol_stats(dir):
+    global sp,sn,nsp,nsn
     with open(dir, 'r',encoding='utf-8', errors='ignore') as csvfile:
         reader = csv.reader(csvfile)
         for original_tweet,text,hashtags,users,length,label in reader:
