@@ -1,8 +1,11 @@
 from collections import defaultdict
 import sys
+import csv
+import algorithms.knn as k
 tweets=[]
 pattern=[]
-count_words = defaultdict(int)
+
+
 freq_words = defaultdict(str)
 classify_dir = sys.argv[1]
 test_dir = sys.argv[2]
@@ -12,6 +15,21 @@ import sys
 
 max = 0
 
+def count(dir_name):
+    words_dict = defaultdict(int)
+    max = 0
+    tweets = []
+    with open(dir_name, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+
+        for tweet, test, hashtag, user, length, sarc in reader:
+            cleaned_tweet = k.clean_tweet_wo_punc(tweet)
+            tweets.append(tweet)
+            for w in cleaned_tweet.split():
+                words_dict[w] += 1
+                if max < words_dict[w]:
+                    max = words_dict[w]
+    cd
 
 
 for line in fin:

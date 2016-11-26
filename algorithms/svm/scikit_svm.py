@@ -63,8 +63,8 @@ def test_svm(testing_features,actual_labels):
 	for feature_set in testing_features:
 		predicted_labels.extend(clf.predict([feature_set]))
 	#print predicted_labels
-	print accuracy_score(actual_labels,predicted_labels)
-	print precision_recall_fscore_support(actual_labels,predicted_labels, average=None, labels=['1','-1'])
+	print(accuracy_score(actual_labels,predicted_labels))
+	print(precision_recall_fscore_support(actual_labels,predicted_labels, average=None, labels=['1','-1']))
 	return
 
 

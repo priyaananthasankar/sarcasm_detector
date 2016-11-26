@@ -18,6 +18,7 @@ import algorithms.knn.tfidf1 as ti
 import sys
 from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
+import json
 
 
 
@@ -101,6 +102,22 @@ def main():
     op_y_seq = neigh.predict(test_x_seq)
     print("Accuracy : "+str(accuracy_score(op_y_seq, test_y_seq)))
 
+
+    print("Accuracy : " + str(accuracy_score(tags_actual, tags_predicted)))
+
+    prf = precision_recall_fscore_support(tags_actual, tags_predicted, average=None, labels=['1', '-1'])
+
+    metrics = {}
+    metrics["accuracy"] = accuracy_score(tags_actual, tags_predicted)
+    metrics["sarcasm_precision"] = prf[0][0]
+    metrics["sarcasm_recall"] = prf[0][1]
+    metrics["sarcasm_f_measure"] = prf[1][0]
+    metrics["not_sarcasm_precision"] = prf[1][1]
+    metrics["not_sarcasm_recall"] = prf[2][0]
+    metrics["not_sarcasm_f_measure"] = prf[2][1]
+
+    json_data = json.dumps(metrics)
+    print(json_data)
 
 if __name__ == '__main__':
     main()
