@@ -1,0 +1,1 @@
+{"polarity_for_sarcasm": {"sarcasm_f_measure": 0.3187289359653346, "sarcasm_recall": 0.22501699524133242, "not_sarcasm_precision": 0.5233918128654971, "accuracy": 0.528, "not_sarcasm_f_measure": 0.5899094437257438, "not_sarcasm_recall": 0.7749830047586675, "sarcasm_precision": 0.5462046204620462}}
