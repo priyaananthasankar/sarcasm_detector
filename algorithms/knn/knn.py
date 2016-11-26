@@ -14,7 +14,7 @@ __status__ = "Prototype"
 import re
 import string
 import csv
-import algorithms.knn.tfidf1 as ti
+import tfidf1 as ti
 import sys
 from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
