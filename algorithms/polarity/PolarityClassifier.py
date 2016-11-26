@@ -119,6 +119,9 @@ def generate_polarity_feature_set(dir):
             feature_set[text] = TextBlob(text).sentiment.polarity
     return feature_set
 
+def get_polarity_per_tweet(tweet):
+    return TextBlob(tweet).sentiment.polarity
+
 def get_polarity_feature_set():
     return feature_set
 
