@@ -15,7 +15,7 @@ __credits__ = ["Priya Ananthasankar","Niranjana Kandavel"]
 __status__  = "Prototype"
 
 
-import sys,csv
+import sys,csv,json
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.naive_bayes import GaussianNB
@@ -27,10 +27,8 @@ import numpy as np
 vec = DictVectorizer()
 data_list_dict =[]
 total_labels = []
+metrics_list ={}
 
-#clf = MultinomialNB()
-#clf = BernoulliNB()
-clf = GaussianNB()
 
 def read_tweets_to_list(file_name):
 	fd = open(file_name,'r')
@@ -57,19 +55,42 @@ def list_to_features(data_list_dict):
 	return x_features;
 
 
-def train_svm(training_features,training_labels):
+def train_svm(clf,training_features,training_labels):
 	clf.fit(training_features, training_labels)
 	return
 
 
-def test_svm(testing_features,actual_labels):
+def test_svm(clf,testing_features,actual_labels,feature_instance):
 	
 	predicted_labels = []
+	metrics = {}
+	temp_dict = {}
+
 	for feature_set in testing_features:
 		predicted_labels.extend(clf.predict([feature_set]))
 	#print predicted_labels
-	print(accuracy_score(actual_labels,predicted_labels))
-	print(precision_recall_fscore_support(actual_labels,predicted_labels, average=None, labels=['1','-1']))
+	accuracy = accuracy_score(actual_labels,predicted_labels)
+	metrics_array = precision_recall_fscore_support(actual_labels,predicted_labels, average=None, labels=['1','-1'])
+	
+	if feature_instance == 1:
+		metrics['title'] = 'MultinomialNB'
+		temp_dict['multinomialnb'] = metrics
+	elif feature_instance == 2:
+		metrics['title'] = 'BernoulliNB'
+		temp_dict['BernoulliNB'] = metrics
+	else:
+		metrics['title'] = ' GaussianNB'
+		temp_dict['gaussiannb'] = metrics
+
+	metrics["accuracy"] = accuracy
+	metrics["sarcasm_precision"] = metrics_array[0][0]
+	metrics["sarcasm_recall"] = metrics_array[1][0]
+	metrics["sarcasm_f_measure"] = metrics_array[2][0]
+	metrics["not_sarcasm_precision"] = metrics_array[0][1]
+	metrics["not_sarcasm_recall"] = metrics_array[1][1]
+	metrics["not_sarcasm_f_measure"] = metrics_array[2][1]
+
+	metrics_list.update(temp_dict)
 	return
 
 
@@ -81,12 +102,24 @@ if __name__ == '__main__':
 	
 	training_features = total_features[:2250]
 	training_labels = total_labels[:2250]
-	train_svm(training_features,training_labels)
-	
 	testing_features = total_features[2250:]
-        testing_labels = total_labels[2250:]
-	test_svm(testing_features,testing_labels)
+	testing_labels = total_labels[2250:]
 
-	#array = vec.fit_transform(data).toarray()
-	#print array
-	#print vec.get_feature_names()
+	clf = MultinomialNB()
+	train_svm(clf,training_features,training_labels)	
+	test_svm(clf,testing_features,testing_labels,1)
+	
+	clf = BernoulliNB()
+	train_svm(clf,training_features,training_labels)
+	test_svm(clf,testing_features,testing_labels,2)
+
+	clf = GaussianNB()
+	train_svm(clf,training_features,training_labels)
+	test_svm(clf,testing_features,testing_labels,3)
+	
+	print("\n\n")
+	json_data = json.dumps(metrics_list)
+	fd = open("metrics.json","w")
+	fd.write(json_data)
+	fd.close
+	print(json_data)

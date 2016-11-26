@@ -87,7 +87,7 @@ def test_svm(testing_features,actual_labels,feature_instance):
 	#print(len(actual_labels))
 	accuracy = accuracy_score(actual_labels,predicted_labels)
 	metrics_array = precision_recall_fscore_support(actual_labels,predicted_labels, average=None, labels=['1','-1'])
-	print(metrics_array)
+	#print(metrics_array)
 	
 	if feature_instance == 1:
 		metrics['title'] = 'SVM with only tweet and length'
@@ -165,3 +165,6 @@ if __name__ == '__main__':
 	print("\n\n")
 	json_data = json.dumps(metrics_list)
 	print(json_data)
+	fd = open("metrics.json","w")
+	fd.write(json_data)
+	fd.close
