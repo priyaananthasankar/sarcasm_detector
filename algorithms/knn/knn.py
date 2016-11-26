@@ -46,6 +46,7 @@ def makeseq(dir_name):
 
     token_count = []
     tweet_length = []
+    cap_count = []
     c = 0
     max = 0
     with open(dir_name, 'r') as csvfile:
@@ -60,33 +61,31 @@ def makeseq(dir_name):
                 continue
             else:
                 tweets.append(cleaned_tweet)
-
                 tweet_length.append(len(cleaned_tweet))
-
-                count_punc = sum((not c.isdigit() and not c.isalpha()) for c in cleaned_tweet_punc)
+                #count_punc = sum((not c.isdigit() and not c.isalpha()) for c in cleaned_tweet_punc)
                 count_capital = sum((c.isupper()) for c in cleaned_tweet_punc)
-                count_s = count_punc+count_capital
+                cap_count.append(count_capital)
                 words = cleaned_tweet.split()
-                token_count.append(count_s)
+                token_count.append(len(words))
                 if max < len(words):
                     max = len(words)
                 x_seq.append(sub_seq)
-
                 if sarc == "S":
                     y_seq.append(1)
                 else:
                     y_seq.append(0)
                 c += 1
-
+    #merging all features to x_seq
     tfidf_val = ti.tfidf(tweets)
     i = 0
     for t in tweets:
+        x_seq[i].append(cap_count[i])
         #token_count feature (normalised)
         x_seq[i].append(token_count[i]/max)
         #tfidf feature
         x_seq[i].append(tfidf_val[i])
         #length_feature
-        x_seq[i].append(tweet_length[i])
+        #x_seq[i].append(tweet_length[i])
         i += 1
     return x_seq, y_seq
 
@@ -135,7 +134,7 @@ def main():
 
     x_seq = add_pattern_feature(classify_dir, x_seq)
     test_x_seq = add_pattern_feature(test_dir, test_x_seq)
-    print (x_seq)
+    #print (x_seq)
 
 
     #knn
