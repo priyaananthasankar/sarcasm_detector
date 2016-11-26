@@ -81,6 +81,7 @@ def test_svm(testing_features,actual_labels,feature_instance):
 
 	for feature_set in testing_features:
 		predicted_labels.extend(clf.predict([feature_set]))
+
 	#print(len(predicted_labels))
 	#print(len(actual_labels))
 	accuracy = accuracy_score(actual_labels,predicted_labels)
