@@ -1,4 +1,3 @@
-import nltk
 import sys
 import csv
 from nltk import ngrams
@@ -8,7 +7,8 @@ from nltk.metrics.scores import   (accuracy, precision, recall, f_measure,
 from nltk import precision
 from textblob import TextBlob
 
-train_data = sys.argv[1]
+combined_data = sys.argv[1]
+train_data = sys.argv[2]
 
 positive_lexicon = "./lexicon/positive-words.txt"
 negative_lexicon = "./lexicon/negative-words.txt"
@@ -30,16 +30,21 @@ observed = collections.defaultdict(set)
 correct_tags = 0
 incorrect_tags = 0
 
+feature_set = {}
+
 def polarizer(dir):
     with open(dir, 'r',encoding='utf-8', errors='ignore') as csvfile:
         reader = csv.reader(csvfile)
         i = 0
         global correct_tags, incorrect_tags
         for original_tweet,text,hashtags,users,length,label in reader:
+            feature_set[text] = TextBlob(text).sentiment.polarity
             words = text.split()
             seed_word = ""
             isSeedWordPositive = False
 
+            # find a seed word which represents the positivity/negativity of the sentence
+            # Then find the prefix and suffix of the seed word as bigrams.
             for word in words:
                 if word in positive_words:
                     seed_word = word
@@ -53,11 +58,9 @@ def polarizer(dir):
 
             if seed_word:
                 if isSeedWordPositive:
-                    # if you got a positive seed word, then take all the bigram prefix and suffix- look for a negative score
                     prefix = prefix_suffix[0]
                     suffix = prefix_suffix[2]
                 else:
-                    # if you got a negative seed, then take all the bigram prefix and suffix - look for a positive score
                     prefix = prefix_suffix[0]
                     suffix = prefix_suffix[2]
 
@@ -67,6 +70,7 @@ def polarizer(dir):
                 pol_prefix = 0.0
                 pol_suffix = 0.0
 
+                # for each prefix and suffix, find out sentiments of individual bi grams
                 for bg in bi_gram_prefix:
                     blob = TextBlob(" ".join(bg))
                     pol_prefix += blob.sentiment.polarity
@@ -74,6 +78,14 @@ def polarizer(dir):
                 for bg in bi_gram_suffix:
                     blob = TextBlob(" ".join(bg))
                     pol_suffix += blob.sentiment.polarity
+
+                # add all the bigram sentiments and test for contrasting polarities
+
+                # if you got a positive seed word, then take all the bigram prefix and suffix-
+                # look for a negative score
+
+                # if you got a negative seed, then take all the bigram prefix and suffix -
+                # look for a positive score
 
                 if (pol_prefix + pol_suffix) > 0 and isSeedWordPositive == False:
                     c_label = "S"
@@ -99,13 +111,18 @@ def polarizer(dir):
                 incorrect_tags += 1
 
             i += 1
-                #print("POLARITY_PREFIX: ", pol_prefix)
-                #print("POLARITY_SUFFIX: ", pol_suffix)
-                #print("SEED WORD:",seed_word, "POLARITY", isSeedWordPositive)
-                #print("PREFIX:",prefix)
-                #print("SUFFIX:",suffix)
 
-polarizer(train_data)
+def generate_polarity_feature_set(dir):
+    with open(dir, 'r',encoding='utf-8', errors='ignore') as csvfile:
+        reader = csv.reader(csvfile)
+        for original_tweet,text,hashtags,users,length,label in reader:
+            feature_set[text] = TextBlob(text).sentiment.polarity
+    return feature_set
+
+def get_polarity_feature_set():
+    return feature_set
+
+polarizer(combined_data)
 
 print("Accuracy: ", correct_tags/(correct_tags + incorrect_tags))
 print('Sarcasm precision:', precision(observed["S"], classified["S"]))

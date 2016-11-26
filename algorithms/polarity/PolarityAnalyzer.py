@@ -57,6 +57,5 @@ pol_stats(test_data)
 print ("TESTING DATA :")
 print ("Sarcastic Positive: " , sp)
 print ("Sarcastic Negative" , sn)
-
 print ("Non Sarcastic Positive: " , nsp)
 print ("Non Sarcastic Negative" , nsn)
