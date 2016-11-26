@@ -79,8 +79,12 @@ def main():
     metrics["not_sarcasm_precision"] = prf[1][1]
     metrics["not_sarcasm_recall"] = prf[2][0]
     metrics["not_sarcasm_f_measure"] = prf[2][1]
+    all_metrics = {}
+    all_metrics["perceptron"] = metrics
 
-    json_data = json.dumps(metrics)
+    fout = open("metrics.json", "wt")
+    json_data = json.dumps(all_metrics)
+    fout.write(json_data)
     print(json_data)
 
 
