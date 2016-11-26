@@ -17,6 +17,8 @@ __status__  = "Prototype"
 
 import sys,csv
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import BernoulliNB
+from sklearn.naive_bayes import GaussianNB
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_recall_fscore_support
@@ -26,7 +28,9 @@ vec = DictVectorizer()
 data_list_dict =[]
 total_labels = []
 
-clf = MultinomialNB()
+#clf = MultinomialNB()
+#clf = BernoulliNB()
+clf = GaussianNB()
 
 def read_tweets_to_list(file_name):
 	fd = open(file_name,'r')
