@@ -6,3 +6,4 @@ Need following packages to be installed in addition to python3 to run :
 2. numpy  : sudo pip3 install numpy
 3. nltk   : sudo pip3 install -U nltk
 4. scikit : sudo pip3 install -U scikit-learn
+5. scipy  : sudo pip3 install scipy
