@@ -97,10 +97,11 @@ with open(train_data, 'r',encoding='utf-8', errors='ignore') as csvfile:
     #print(feature_set)
     me_classifier = MaxentClassifier.train(feature_set,"megam")
 
+accuracy = 0.0
 with open(test_data,'r',encoding='utf-8', errors='ignore') as testcsvfile:
     test_reader = csv.reader(testcsvfile)
     test_feature_set = [(feature_set_generator(original_tweet,text,hashtags,users,length,label),label) for original_tweet,text,hashtags,users,length,label in test_reader]
-    print("Accuracy: " ,classify.accuracy(me_classifier, test_feature_set))
+    accuracy = classify.accuracy(me_classifier, test_feature_set)
 
 classified = collections.defaultdict(set)
 observed = collections.defaultdict(set)
@@ -112,7 +113,9 @@ with open(test_data,'r',encoding='utf-8', errors='ignore') as testcsvfile:
         classified[me_classifier.classify(feature_set_generator(original_tweet,text,hashtags,users,length,label))].add(i)
         i+=1
 
+print()
 print("****************** MAX ENTROPY STATISTICS******************************")
+print('Accuracy:', accuracy)
 print('Sarcasm precision:', precision(observed["S"], classified["S"]))
 print('Sarcasm recall:', recall(observed['S'], classified['S']))
 print('Sarcasm F-measure:', f_measure(observed['S'], classified['S']))
