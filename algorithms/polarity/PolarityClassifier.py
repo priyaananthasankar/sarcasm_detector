@@ -7,6 +7,7 @@ from nltk.metrics.scores import   (accuracy, precision, recall, f_measure,
 from nltk import precision
 from textblob import TextBlob
 from nltk.corpus import opinion_lexicon as lexicon
+import json
 
 combined_data = sys.argv[1]
 train_data = sys.argv[2]
@@ -128,6 +129,21 @@ def get_polarity_feature_set():
 
 
 polarizer(combined_data)
+
+metrics = {}
+metrics["accuracy"] = correct_tags/(correct_tags + incorrect_tags)
+metrics["sarcasm_precision"] = precision(observed["S"], classified["S"])
+metrics["sarcasm_recall"] = recall(observed['S'], classified['S'])
+metrics["sarcasm_f_measure"] = f_measure(observed['S'], classified['S'])
+metrics["not_sarcasm_precision"] = precision(observed['NS'], classified['NS'])
+metrics["not_sarcasm_recall"] = recall(observed['S'], classified['NS'])
+metrics["not_sarcasm_f_measure"] = f_measure(observed['S'], classified['NS'])
+
+json_data = json.dumps(metrics)
+print(json_data)
+
+def get_json_data():
+    return json_data
 
 print("******************POLARIZER STATISTICS******************************")
 print("Accuracy: ", correct_tags/(correct_tags + incorrect_tags))

@@ -16,6 +16,7 @@ from nltk.corpus import names
 import collections,re
 import csv
 import PolarityClassifier as polarity
+import json
 
 train_data = sys.argv[1]
 test_data = sys.argv[2]
@@ -112,6 +113,21 @@ with open(test_data,'r',encoding='utf-8', errors='ignore') as testcsvfile:
         observed[label].add(i)
         classified[me_classifier.classify(feature_set_generator(original_tweet,text,hashtags,users,length,label))].add(i)
         i+=1
+
+metrics = {}
+metrics["accuracy"] = accuracy
+metrics["sarcasm_precision"] = precision(observed["S"], classified["S"])
+metrics["sarcasm_recall"] = recall(observed['S'], classified['S'])
+metrics["sarcasm_f_measure"] = f_measure(observed['S'], classified['S'])
+metrics["not_sarcasm_precision"] = precision(observed['NS'], classified['NS'])
+metrics["not_sarcasm_recall"] = recall(observed['S'], classified['NS'])
+metrics["not_sarcasm_f_measure"] = f_measure(observed['S'], classified['NS'])
+
+json_data = json.dumps(metrics)
+print(json_data)
+
+def get_json_data():
+    return json_data
 
 print()
 print("****************** MAX ENTROPY STATISTICS******************************")
