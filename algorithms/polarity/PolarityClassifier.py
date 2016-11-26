@@ -6,29 +6,30 @@ from nltk.metrics.scores import   (accuracy, precision, recall, f_measure,
                                           log_likelihood, approxrand)
 from nltk import precision
 from textblob import TextBlob
+from nltk.corpus import opinion_lexicon as lexicon
 
 combined_data = sys.argv[1]
 train_data = sys.argv[2]
 
-positive_lexicon = "./lexicon/positive-words.txt"
-negative_lexicon = "./lexicon/negative-words.txt"
-
 positive_words = []
 negative_words = []
 
-positive_words = [line.rstrip('\n') for line in open(positive_lexicon,'r',encoding='utf-8', errors='ignore')]
-negative_words = [line.rstrip('\n') for line in open(negative_lexicon,'r',encoding='utf-8', errors='ignore')]
 
 sp = 0
 sn =0
 nsp = 0
 nsn = 0
 
-
 classified = collections.defaultdict(set)
 observed = collections.defaultdict(set)
 correct_tags = 0
 incorrect_tags = 0
+
+# get all the words from Opinion Lexicon of Liu
+for positive in lexicon.positive():
+    positive_words.append(positive)
+for negative in lexicon.negative():
+    negative_words.append(negative)
 
 feature_set = {}
 
@@ -124,6 +125,7 @@ def get_polarity_per_tweet(tweet):
 
 def get_polarity_feature_set():
     return feature_set
+
 
 polarizer(combined_data)
 

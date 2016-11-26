@@ -1,7 +1,8 @@
 # Author: Priya Ananthasankar
 # Year: 2016
 # Description: Maximum Entropy Classifier for Sarcasm Classification using NLTK + MegaM
-
+import sys
+sys.path.append('../polarity/')
 import nltk
 import nltk.data
 from nltk.metrics.scores import   (accuracy, precision, recall, f_measure,
@@ -14,10 +15,12 @@ from nltk.classify.megam import call_megam, write_megam_file, parse_megam_weight
 from nltk.corpus import names
 import collections,re
 import csv
-import sys
+import PolarityClassifier as polarity
 
 train_data = sys.argv[1]
 test_data = sys.argv[2]
+
+print (sys.path)
 
 # Sample using Gender Features
 #names = ([(name, 'male') for name in names.words('male.txt')] + [(name, 'female') for name in names.words('female.txt')])
@@ -65,6 +68,9 @@ def feature_set_generator(original_tweet,text,hashtags,users,length,label):
 
     # Part of speech tagging
     features["pos"] = tuple(t for t in set_of_pos_tags)
+
+    features["polarity"] = polarity.get_polarity_per_tweet(text)
+
     return features
 
 me_classifier = 0
