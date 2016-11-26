@@ -114,6 +114,8 @@ def polarizer(dir):
 
             i += 1
 
+
+
 def generate_polarity_feature_set(dir):
     with open(dir, 'r',encoding='utf-8', errors='ignore') as csvfile:
         reader = csv.reader(csvfile)
@@ -131,26 +133,25 @@ def get_polarity_feature_set():
 polarizer(combined_data)
 
 metrics = {}
-metrics["accuracy"] = correct_tags/(correct_tags + incorrect_tags)
-metrics["sarcasm_precision"] = precision(observed["S"], classified["S"])
-metrics["sarcasm_recall"] = recall(observed['S'], classified['S'])
-metrics["sarcasm_f_measure"] = f_measure(observed['S'], classified['S'])
-metrics["not_sarcasm_precision"] = precision(observed['NS'], classified['NS'])
-metrics["not_sarcasm_recall"] = recall(observed['S'], classified['NS'])
-metrics["not_sarcasm_f_measure"] = f_measure(observed['S'], classified['NS'])
+
+polarity_for_sarcasm = {}
+polarity_for_sarcasm["accuracy"] = correct_tags/(correct_tags + incorrect_tags)
+polarity_for_sarcasm["sarcasm_precision"] = precision(observed["S"], classified["S"])
+polarity_for_sarcasm["sarcasm_recall"] = recall(observed['S'], classified['S'])
+polarity_for_sarcasm["sarcasm_f_measure"] = f_measure(observed['S'], classified['S'])
+polarity_for_sarcasm["not_sarcasm_precision"] = precision(observed['NS'], classified['NS'])
+polarity_for_sarcasm["not_sarcasm_recall"] = recall(observed['S'], classified['NS'])
+polarity_for_sarcasm["not_sarcasm_f_measure"] = f_measure(observed['S'], classified['NS'])
+
+metrics["polarity_for_sarcasm"] = polarity_for_sarcasm
 
 json_data = json.dumps(metrics)
-print(json_data)
+output_json = open('metrics.json','w')
+output_json.write(json_data)
+output_json.close()
+
 
 def get_json_data():
     return json_data
 
-print("******************POLARIZER STATISTICS******************************")
-print("Accuracy: ", correct_tags/(correct_tags + incorrect_tags))
-print('Sarcasm precision:', precision(observed["S"], classified["S"]))
-print('Sarcasm recall:', recall(observed['S'], classified['S']))
-print('Sarcasm F-measure:', f_measure(observed['S'], classified['S']))
-print('Not Sarcasm precision:',precision(observed['NS'], classified['NS']))
-print('Not Sarcasm recall:', recall(observed['S'], classified['NS']))
-print('Not Sarcasm F-measure:', f_measure(observed['S'], classified['NS']))
-print("********************************************************************")
+
