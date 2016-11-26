@@ -20,8 +20,6 @@ import PolarityClassifier as polarity
 train_data = sys.argv[1]
 test_data = sys.argv[2]
 
-print (sys.path)
-
 # Sample using Gender Features
 #names = ([(name, 'male') for name in names.words('male.txt')] + [(name, 'female') for name in names.words('female.txt')])
 #random.shuffle(names)
@@ -58,17 +56,36 @@ def feature_set_generator(original_tweet,text,hashtags,users,length,label):
     features = {}
     words = text.split()
     pos = nltk.word_tokenize(text)
+
     # Bag of words
     features["words"] = tuple((word,True) for word in words)
+
     # Length
     features["length"] = length
+
     # Hashtags
     features["hashtags"] = hashtags
     set_of_pos_tags = nltk.pos_tag(pos)
 
+    # Interjections - SUBSTANTIAL INCREASE IN ACCURACY
+    interjection_tags = 0
+    for tag in set_of_pos_tags:
+        if tag == "UH":
+            interjection_tags += 1
+
+    """# Onomatopoeia - SUBSTANTIAL DROP IN ACCURACY
+    onomatopoeia_count = 0
+    for text in words:
+        if text in onomatopoeia:
+            onomatopoeia_count += 1
+    features["onomatopoeia"] = onomatopoeia_count"""
+
+    features["interjection"] = interjection_tags
+
     # Part of speech tagging
     features["pos"] = tuple(t for t in set_of_pos_tags)
 
+    # Polarity of text - SUBSTANTIAL INCREASE IN ACCURACY
     features["polarity"] = polarity.get_polarity_per_tweet(text)
 
     return features
@@ -95,10 +112,12 @@ with open(test_data,'r',encoding='utf-8', errors='ignore') as testcsvfile:
         classified[me_classifier.classify(feature_set_generator(original_tweet,text,hashtags,users,length,label))].add(i)
         i+=1
 
-
+print("****************** MAX ENTROPY STATISTICS******************************")
 print('Sarcasm precision:', precision(observed["S"], classified["S"]))
 print('Sarcasm recall:', recall(observed['S'], classified['S']))
 print('Sarcasm F-measure:', f_measure(observed['S'], classified['S']))
 print('Not Sarcasm precision:',precision(observed['NS'], classified['NS']))
 print('Not Sarcasm recall:', recall(observed['S'], classified['NS']))
 print('Not Sarcasm F-measure:', f_measure(observed['S'], classified['NS']))
+print("***********************************************************************")
+

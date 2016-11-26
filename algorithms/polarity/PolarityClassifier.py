@@ -129,6 +129,7 @@ def get_polarity_feature_set():
 
 polarizer(combined_data)
 
+print("******************POLARIZER STATISTICS******************************")
 print("Accuracy: ", correct_tags/(correct_tags + incorrect_tags))
 print('Sarcasm precision:', precision(observed["S"], classified["S"]))
 print('Sarcasm recall:', recall(observed['S'], classified['S']))
@@ -136,3 +137,4 @@ print('Sarcasm F-measure:', f_measure(observed['S'], classified['S']))
 print('Not Sarcasm precision:',precision(observed['NS'], classified['NS']))
 print('Not Sarcasm recall:', recall(observed['S'], classified['NS']))
 print('Not Sarcasm F-measure:', f_measure(observed['S'], classified['NS']))
+print("********************************************************************")
