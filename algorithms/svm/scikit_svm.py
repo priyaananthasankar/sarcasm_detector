@@ -28,7 +28,7 @@ from sklearn import preprocessing
 
 vec = DictVectorizer()
 clf = svm.LinearSVC()
-metrics_list =[]
+metrics_list ={}
 
 def read_tweets_to_list(file_name,data_list_dict,total_labels,feature_set):
 	fd = open(file_name,'r')
@@ -78,6 +78,7 @@ def test_svm(testing_features,actual_labels,feature_instance):
 	
 	predicted_labels = []
 	metrics = {}
+	temp_dict = {}
 
 	for feature_set in testing_features:
 		predicted_labels.extend(clf.predict([feature_set]))
@@ -89,11 +90,14 @@ def test_svm(testing_features,actual_labels,feature_instance):
 	print(metrics_array)
 	
 	if feature_instance == 1:
-		metrics['feature_type'] = 'feature_basic'
+		metrics['title'] = 'SVM with only tweet and length'
+		temp_dict['svm_with_two_features'] = metrics
 	elif feature_instance == 2:
-		metrics['feature_type'] = 'feature_intj'
+		metrics['title'] = 'SVM with tweet,length and interjection'
+		temp_dict['svm_with_three_features'] = metrics
 	else:
-		metrics['feature_type'] = 'feature_intjploar'
+		metrics['title'] = 'SVM with tweet,length,interjection and polarity'
+		temp_dict['svm_with_four_features'] = metrics
 
 	metrics["accuracy"] = accuracy
 	metrics["sarcasm_precision"] = metrics_array[0][0]
@@ -103,7 +107,7 @@ def test_svm(testing_features,actual_labels,feature_instance):
 	metrics["not_sarcasm_recall"] = metrics_array[1][1]
 	metrics["not_sarcasm_f_measure"] = metrics_array[2][1]
 	
-	metrics_list.append(metrics)
+	metrics_list.update(temp_dict)
 	return
 
 
