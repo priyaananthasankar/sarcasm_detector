@@ -1,4 +1,3 @@
-import nltk
 import sys
 import csv
 train_data = sys.argv[1]

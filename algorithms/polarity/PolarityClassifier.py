@@ -9,7 +9,6 @@ from nltk import precision
 from textblob import TextBlob
 
 train_data = sys.argv[1]
-test_data = sys.argv[2]
 
 positive_lexicon = "./lexicon/positive-words.txt"
 negative_lexicon = "./lexicon/negative-words.txt"
@@ -107,7 +106,6 @@ def polarizer(dir):
                 #print("SUFFIX:",suffix)
 
 polarizer(train_data)
-polarizer(test_data)
 
 print("Accuracy: ", correct_tags/(correct_tags + incorrect_tags))
 print('Sarcasm precision:', precision(observed["S"], classified["S"]))
