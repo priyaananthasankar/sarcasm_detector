@@ -1,3 +1,18 @@
+"""
+USC Computer Science 544: Applied Natural Language Processing
+
+File name   : PolarityClassifier.py
+Usage       : python PolarityClassifier.py ../../data/combined.csv ../../data/training_tweets.csv
+Description : This file calculates the polarity of a  sentence.
+              For a sarcastic sentence, we need to calculate a situational or contextual polarity/
+              alongwith a seed word polarity. If contrasting polarities are found then the tweet
+              is tagged as sarcastics
+"""
+__author__  = "Priya Ananthasankar"
+__email__   = "panantha@usc.edu"
+__credits__ = ["Ravi Kiran Chadalawada","Niranjana Kandavel"]
+__status__  = "Prototype"
+
 import sys
 import csv
 from nltk import ngrams

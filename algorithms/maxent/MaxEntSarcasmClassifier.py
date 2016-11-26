@@ -1,6 +1,15 @@
-# Author: Priya Ananthasankar
-# Year: 2016
-# Description: Maximum Entropy Classifier for Sarcasm Classification using NLTK + MegaM
+"""
+USC Computer Science 544: Applied Natural Language Processing
+
+File name   : MaxEntSarcasmClassifier.py
+Usage       : python3 MaxEntSarcasmClassifier.py ../../data/training_tweets.csv ../../data/testing_tweets.csv
+Description : A Maximum Entropy Sarcasm Classifier using NLTK + MegaM library
+"""
+__author__  = "Priya Ananthasankar"
+__email__   = "panantha@usc.edu"
+__credits__ = ["Ravi Kiran Chadalawada","Niranjana Kandavel"]
+__status__  = "Prototype"
+
 import sys
 sys.path.append('../polarity/')
 import nltk

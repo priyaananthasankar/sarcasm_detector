@@ -1,3 +1,18 @@
+"""
+USC Computer Science 544: Applied Natural Language Processing
+
+File name   : PolarityAnalyzer.py
+Usage       : python3 PolarityAnalyzer.py ../../data/training_tweets.csv ../../data/testing_tweets.csv
+Description : This file is used to just show some numbers on how many tweets in
+              sarcasm labelled corpus are positive/negative
+
+"""
+__author__  = "Priya Ananthasankar"
+__email__   = "panantha@usc.edu"
+__credits__ = ["Ravi Kiran Chadalawada","Niranjana Kandavel"]
+__status__  = "Prototype"
+
+
 import sys
 import csv
 train_data = sys.argv[1]
