@@ -97,7 +97,7 @@ def main():
     test_x_seq, test_y_seq = makeseq(test_dir)
     #knn
     neigh = KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
-               metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+               metric_params=None, n_jobs=1, n_neighbors=3, p=2,
                weights='uniform')
     neigh.fit(x_seq, y_seq)
     op_y_seq = neigh.predict(test_x_seq)
@@ -105,23 +105,24 @@ def main():
 
 
 
-    prf = precision_recall_fscore_support(op_y_seq, test_y_seq, average=None, labels=['1', '-1'])
+    prf = precision_recall_fscore_support(op_y_seq, test_y_seq, average=None, labels=['1', '0'])
 
     print (prf)
 
     metrics = {}
+    metrics["title"] = "knn_all_features"
     metrics["accuracy"] = accuracy_score(op_y_seq, test_y_seq)
     metrics["sarcasm_precision"] = prf[0][0]
-    metrics["sarcasm_recall"] = prf[0][1]
-    metrics["sarcasm_f_measure"] = prf[1][0]
-    metrics["not_sarcasm_precision"] = prf[1][1]
-    metrics["not_sarcasm_recall"] = prf[2][0]
+    metrics["not_sarcasm_precision"] = prf[0][1]
+    metrics["sarcasm_recall"] = prf[1][0]
+    metrics["not_sarcasm_recall"] = prf[1][1]
+    metrics["sarcasm_f_measure"] = prf[2][0]
     metrics["not_sarcasm_f_measure"] = prf[2][1]
     all_metrics = {}
-    all_metrics["perceptron"] = metrics
+    all_metrics["knn_all_features"] = metrics
 
     fout = open("metrics.json", "wt")
-    json_data = json.dumps(metrics)
+    json_data = json.dumps(all_metrics)
     fout.write(json_data)
     print(json_data)
 
