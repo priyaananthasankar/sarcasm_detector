@@ -52,91 +52,147 @@ onomatopoeia = ["bang","bark", "bash", "beep", "biff", "blah", "blare", "blat", 
                 "yip", "yowl" ,"zap", "zing", "zip", "zoom"]
 
 
-
-def feature_set_generator(original_tweet,text,hashtags,users,length,label):
+all_features = ["words","length","hashtag","pos","interjection","onomatopoeia","polarity"]
+metrics = {
+            "max_ent_with_all_features" : {},
+            "max_ent_with_only_pos": {},
+            "max_ent_with_only_polarity": {},
+            "max_ent_with_only_interjection": {},
+            "max_ent_without_onamatopoeia":{}
+          }
+def feature_set_generator(original_tweet,text,hashtags,users,length,label, include_list):
     features = {}
     words = text.split()
-    pos = nltk.word_tokenize(text)
+
+    if not include_list:
+        include_list = all_features
 
     # Bag of words
-    features["words"] = tuple((word,True) for word in words)
+    if("words" in include_list):
+        features["words"] = tuple((word,True) for word in words)
 
     # Length
-    features["length"] = length
+    if("length" in include_list):
+        features["length"] = length
 
-    # Hashtags
-    features["hashtags"] = hashtags
-    set_of_pos_tags = nltk.pos_tag(pos)
-
-    # Interjections - SUBSTANTIAL INCREASE IN ACCURACY
-    interjection_tags = 0
-    for tag in set_of_pos_tags:
-        if tag == "UH":
-            interjection_tags += 1
-
-    """# Onomatopoeia - SUBSTANTIAL DROP IN ACCURACY
-    onomatopoeia_count = 0
-    for text in words:
-        if text in onomatopoeia:
-            onomatopoeia_count += 1
-    features["onomatopoeia"] = onomatopoeia_count"""
-
-    features["interjection"] = interjection_tags
+    # Hash tags
+    if("hashtag" in include_list):
+        features["hashtags"] = hashtags
 
     # Part of speech tagging
-    features["pos"] = tuple(t for t in set_of_pos_tags)
+    pos = nltk.word_tokenize(text)
+    if("pos" in include_list):
+        set_of_pos_tags = nltk.pos_tag(pos)
+        features["pos"] = tuple(t for t in set_of_pos_tags)
+
+
+    # Interjections - SUBSTANTIAL INCREASE IN ACCURACY
+    if("interjection" in include_list):
+        set_of_pos_tags = nltk.pos_tag(pos)
+        interjection_tags = 0
+        for tag in set_of_pos_tags:
+            if tag == "UH":
+                interjection_tags += 1
+        features["interjection"] = interjection_tags
+
+    # Onomatopoeia - SUBSTANTIAL DROP IN ACCURACY
+    if("onomatopoeia" in include_list):
+        onomatopoeia_count = 0
+        for text in words:
+            if text in onomatopoeia:
+                onomatopoeia_count += 1
+        features["onomatopoeia"] = onomatopoeia_count
 
     # Polarity of text - SUBSTANTIAL INCREASE IN ACCURACY
-    features["polarity"] = polarity.get_polarity_per_tweet(text)
+    if("polarity" in include_list):
+        features["polarity"] = polarity.get_polarity_per_tweet(text)
 
     return features
 
-me_classifier = 0
-with open(train_data, 'r',encoding='utf-8', errors='ignore') as csvfile:
-    reader = csv.reader(csvfile)
-    feature_set = [(feature_set_generator(original_tweet,text,hashtags,users,length,label),label) for original_tweet,text,hashtags,users,length,label in reader]
-    #print(feature_set)
-    me_classifier = MaxentClassifier.train(feature_set,"megam")
+def me_classifier(exclude_list):
+    me_classifier = 0
 
-accuracy = 0.0
-with open(test_data,'r',encoding='utf-8', errors='ignore') as testcsvfile:
-    test_reader = csv.reader(testcsvfile)
-    test_feature_set = [(feature_set_generator(original_tweet,text,hashtags,users,length,label),label) for original_tweet,text,hashtags,users,length,label in test_reader]
-    accuracy = classify.accuracy(me_classifier, test_feature_set)
+    with open(train_data, 'r',encoding='utf-8', errors='ignore') as csvfile:
+        reader = csv.reader(csvfile)
+        feature_set = [(feature_set_generator(original_tweet,text,hashtags,users,length,label,exclude_list),label) for original_tweet,text,hashtags,users,length,label in reader]
+        #print(feature_set)
+        me_classifier = MaxentClassifier.train(feature_set,"megam")
 
-classified = collections.defaultdict(set)
-observed = collections.defaultdict(set)
-i=1
-with open(test_data,'r',encoding='utf-8', errors='ignore') as testcsvfile:
-    test_reader = csv.reader(testcsvfile)
-    for original_tweet,text,hashtags,users,length,label in test_reader:
-        observed[label].add(i)
-        classified[me_classifier.classify(feature_set_generator(original_tweet,text,hashtags,users,length,label))].add(i)
-        i+=1
+    accuracy = 0.0
+    with open(test_data,'r',encoding='utf-8', errors='ignore') as testcsvfile:
+        test_reader = csv.reader(testcsvfile)
+        test_feature_set = [(feature_set_generator(original_tweet,text,hashtags,users,length,label,exclude_list),label) for original_tweet,text,hashtags,users,length,label in test_reader]
+        accuracy = classify.accuracy(me_classifier, test_feature_set)
 
-metrics = {}
-metrics["accuracy"] = accuracy
-metrics["sarcasm_precision"] = precision(observed["S"], classified["S"])
-metrics["sarcasm_recall"] = recall(observed['S'], classified['S'])
-metrics["sarcasm_f_measure"] = f_measure(observed['S'], classified['S'])
-metrics["not_sarcasm_precision"] = precision(observed['NS'], classified['NS'])
-metrics["not_sarcasm_recall"] = recall(observed['S'], classified['NS'])
-metrics["not_sarcasm_f_measure"] = f_measure(observed['S'], classified['NS'])
+    classified = collections.defaultdict(set)
+    observed = collections.defaultdict(set)
+    i=1
+    with open(test_data,'r',encoding='utf-8', errors='ignore') as testcsvfile:
+        test_reader = csv.reader(testcsvfile)
+        for original_tweet,text,hashtags,users,length,label in test_reader:
+            observed[label].add(i)
+            classified[me_classifier.classify(feature_set_generator(original_tweet,text,hashtags,users,length,label,exclude_list))].add(i)
+            i+=1
+
+    return accuracy,precision(observed["S"], classified["S"]),recall(observed['S'], classified['S']),\
+           f_measure(observed['S'], classified['S']),precision(observed['NS'], classified['NS']),recall(observed['S'], classified['NS']),f_measure(observed['S'], classified['NS'])
+
+
+def print_stats(a,ps,rs,fs,pns,rns,fns):
+    print()
+    print("****************** MAX ENTROPY STATISTICS******************************")
+    print('Accuracy:', a)
+    print('Sarcasm precision:', ps)
+    print('Sarcasm recall:', rs)
+    print('Sarcasm F-measure:', fs)
+    print('Not Sarcasm precision:',pns)
+    print('Not Sarcasm recall:', rns)
+    print('Not Sarcasm F-measure:', fns)
+    print("***********************************************************************")
+
+
+def prepare_dict(dict,a,ps,rs,fs,pns,rns,fns):
+    dict = {}
+    dict["title"] = "Maximum Entropy with all features"
+    dict["accuracy"] = a
+    dict["sarcasm_precision"] = ps
+    dict["sarcasm_recall"] = rs
+    dict["sarcasm_f_measure"] = fs
+    dict["not_sarcasm_precision"] = pns
+    dict["not_sarcasm_recall"] = rns
+    dict["not_sarcasm_f_measure"] = fns
+    return dict
+
+a,ps,rs,fs,pns,rns,fns = me_classifier([])
+max_ent_with_all_features = {}
+metrics["max_ent_with_all_features"]=prepare_dict(max_ent_with_all_features,a,ps,rs,fs,pns,rns,fns)
+print_stats(a,ps,rs,fs,pns,rns,fns)
+
+a,ps,rs,fs,pns,rns,fns = me_classifier(["pos"])
+max_ent_with_only_pos = {}
+metrics["max_ent_with_only_pos"]=prepare_dict(max_ent_with_only_pos,a,ps,rs,fs,pns,rns,fns)
+print_stats(a,ps,rs,fs,pns,rns,fns)
+
+a,ps,rs,fs,pns,rns,fns = me_classifier(["polarity"])
+max_ent_with_only_polarity = {}
+metrics["max_ent_with_only_polarity"]=prepare_dict(max_ent_with_only_polarity,a,ps,rs,fs,pns,rns,fns)
+print_stats(a,ps,rs,fs,pns,rns,fns)
+
+a,ps,rs,fs,pns,rns,fns = me_classifier(["interjection"])
+max_ent_with_only_interjection = {}
+metrics["max_ent_with_only_interjection"]=prepare_dict(max_ent_with_only_interjection,a,ps,rs,fs,pns,rns,fns)
+print_stats(a,ps,rs,fs,pns,rns,fns)
+
+a,ps,rs,fs,pns,rns,fns = me_classifier(["words","length","hashtag","pos","interjection","polarity"])
+max_ent_without_onamatopoeia = {}
+metrics["max_ent_without_onamatopoeia"]=prepare_dict(max_ent_without_onamatopoeia,a,ps,rs,fs,pns,rns,fns)
+print_stats(a,ps,rs,fs,pns,rns,fns)
 
 json_data = json.dumps(metrics)
-print(json_data)
+output_json = open('metrics.json','w')
+output_json.write(json_data)
+output_json.close()
 
-def get_json_data():
-    return json_data
 
-print()
-print("****************** MAX ENTROPY STATISTICS******************************")
-print('Accuracy:', accuracy)
-print('Sarcasm precision:', precision(observed["S"], classified["S"]))
-print('Sarcasm recall:', recall(observed['S'], classified['S']))
-print('Sarcasm F-measure:', f_measure(observed['S'], classified['S']))
-print('Not Sarcasm precision:',precision(observed['NS'], classified['NS']))
-print('Not Sarcasm recall:', recall(observed['S'], classified['NS']))
-print('Not Sarcasm F-measure:', f_measure(observed['S'], classified['NS']))
-print("***********************************************************************")
+
 
