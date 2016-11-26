@@ -20,16 +20,17 @@ from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import precision_recall_fscore_support
 import json
+import pattern_feature as pf
 
 
 
 
-def clean_tweet_with_punc (tweet):
+def clean_tweet_with_punc(tweet):
     tweet = re.sub(r'(https|http)?:\/\/(\w|\.|\/|\?|\=|\&|\%)*\b', "", tweet, flags=re.MULTILINE)
     tweet = re.sub(r"([@])(\w+)\b", "", tweet, flags=re.MULTILINE)
     return(tweet)
 
-def clean_tweet_wo_punc (tweet):
+def clean_tweet_wo_punc(tweet):
     tweet = re.sub(r'(https|http)?:\/\/(\w|\.|\/|\?|\=|\&|\%)*\b', "", tweet, flags=re.MULTILINE)
     tweet = re.sub(r"([@])(\w+)\b", "", tweet, flags=re.MULTILINE)
     tweet = "".join(l for l in tweet if l not in string.punctuation)
@@ -66,7 +67,7 @@ def makeseq(dir_name):
                 count_capital = sum((c.isupper()) for c in cleaned_tweet_punc)
                 count_s = count_punc+count_capital
                 words = cleaned_tweet.split()
-                token_count.append(len(words))
+                token_count.append(count_s)
                 if max < len(words):
                     max = len(words)
                 x_seq.append(sub_seq)
@@ -89,12 +90,23 @@ def makeseq(dir_name):
         i += 1
     return x_seq, y_seq
 
+def add_pattern_feature(dir_name, x_seq):
+    #to add pattern feature
+    pattern_fetaure_list = pf.pattern_feature(dir_name)
+    for i in range(0, len(x_seq)):
+        x_seq[i].append(pattern_fetaure_list[i])
+    return x_seq
+
 
 def main():
     classify_dir = sys.argv[1]
     test_dir = sys.argv[2]
     x_seq, y_seq = makeseq(classify_dir)
     test_x_seq, test_y_seq = makeseq(test_dir)
+
+
+
+
     #knn
     neigh = KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
                metric_params=None, n_jobs=1, n_neighbors=3, p=2,
@@ -107,7 +119,39 @@ def main():
 
     prf = precision_recall_fscore_support(op_y_seq, test_y_seq, average=None, labels=['1', '0'])
 
-    print (prf)
+
+    metrics = {}
+    metrics["title"] = "knn_without_pattern_feature"
+    metrics["accuracy"] = accuracy_score(op_y_seq, test_y_seq)
+    metrics["sarcasm_precision"] = prf[0][0]
+    metrics["not_sarcasm_precision"] = prf[0][1]
+    metrics["sarcasm_recall"] = prf[1][0]
+    metrics["not_sarcasm_recall"] = prf[1][1]
+    metrics["sarcasm_f_measure"] = prf[2][0]
+    metrics["not_sarcasm_f_measure"] = prf[2][1]
+    all_metrics = {}
+    all_metrics["knn_without_pattern_feature"] = metrics
+
+
+    x_seq = add_pattern_feature(classify_dir, x_seq)
+    test_x_seq = add_pattern_feature(test_dir, test_x_seq)
+    print (x_seq)
+
+
+    #knn
+    neigh = KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+               metric_params=None, n_jobs=1, n_neighbors=3, p=2,
+               weights='uniform')
+    neigh.fit(x_seq, y_seq)
+    op_y_seq = neigh.predict(test_x_seq)
+    print("Accuracy : "+str(accuracy_score(op_y_seq, test_y_seq)))
+
+
+
+    prf = precision_recall_fscore_support(op_y_seq, test_y_seq, average=None, labels=['1', '0'])
+
+
+
 
     metrics = {}
     metrics["title"] = "knn_all_features"
@@ -118,7 +162,6 @@ def main():
     metrics["not_sarcasm_recall"] = prf[1][1]
     metrics["sarcasm_f_measure"] = prf[2][0]
     metrics["not_sarcasm_f_measure"] = prf[2][1]
-    all_metrics = {}
     all_metrics["knn_all_features"] = metrics
 
     fout = open("metrics.json", "wt")
