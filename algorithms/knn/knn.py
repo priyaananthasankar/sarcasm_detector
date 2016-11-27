@@ -163,7 +163,10 @@ def main():
     metrics["not_sarcasm_f_measure"] = prf[2][1]
     all_metrics["knn_all_features"] = metrics
 
-    fout = open("metrics.json", "wt")
+    if "pol" in test_dir:
+        fout = open("political_metrics.json","wt")
+    else:
+        fout = open("metrics.json", "wt")
     json_data = json.dumps(all_metrics)
     fout.write(json_data)
     print(json_data)

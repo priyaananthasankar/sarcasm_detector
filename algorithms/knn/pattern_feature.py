@@ -36,7 +36,9 @@ def pattern_extraction(dir_name, sar):
                     words_dict[w] += 1
                     if max < words_dict[w]:
                         max = words_dict[w]
-    threshold = max / 100
+    threshold = max / 10
+    if threshold < 1:
+        threshold = 2
     #for "hlhl" kind of pattern
     all_patterns = []
     for t in tweets:
@@ -76,7 +78,9 @@ def feature_create(dir_name, sar_patterns, nonsar_patterns):
                 words_dict[w] += 1
                 if max < words_dict[w]:
                     max = words_dict[w]
-    threshold = max / 100
+    threshold = max / 10
+    if threshold < 1:
+        threshold = 2
     feature = []
     with open(dir_name, 'r') as csvfile:
         reader = csv.reader(csvfile)
@@ -88,6 +92,7 @@ def feature_create(dir_name, sar_patterns, nonsar_patterns):
                     pattern += "h"
                 else:
                     pattern += "l"
+
             if sarc == "S":
                 #find matching sarcastic patterns for a tweet
                 featureval = 0
@@ -111,9 +116,9 @@ def feature_create(dir_name, sar_patterns, nonsar_patterns):
 def pattern_feature(dir_name):
     #get all sarcastic pattern
     sar_patterns = pattern_extraction(dir_name, "S")
+
     # get all non sarcastic pattern
     nonsar_patterns = pattern_extraction(dir_name, "NS")
-
     intersect = sar_patterns.intersection(nonsar_patterns)
 
     #ignoring unwanted patterns
@@ -129,7 +134,7 @@ def pattern_feature(dir_name):
 
 
 
-
+pattern_feature(sys.argv[2])
 
 
 
