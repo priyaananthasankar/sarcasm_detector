@@ -83,7 +83,10 @@ def main():
     all_metrics = {}
     all_metrics["perceptron"] = metrics
 
-    fout = open("metrics.json", "wt")
+    if "pol" in test_dir:
+        fout = open("political_metrics.json","wt")
+    else:
+        fout = open("metrics.json", "wt")
     json_data = json.dumps(all_metrics)
     fout.write(json_data)
     print(json_data)

@@ -1,0 +1,1 @@
+{"perceptron": {"sarcasm_f_measure": 0.9130434782608696, "not_sarcasm_f_measure": 0.0, "title": "perceptron_all_features", "accuracy": 0.84, "not_sarcasm_precision": 0.0, "sarcasm_precision": 1.0, "not_sarcasm_recall": 0.0, "sarcasm_recall": 0.84}}
