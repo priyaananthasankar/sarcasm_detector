@@ -61,13 +61,9 @@ onomatopoeia = ["bang","bark", "bash", "beep", "biff", "blah", "blare", "blat", 
                 "yip", "yowl" ,"zap", "zing", "zip", "zoom"]
 
 
-all_features = ["words","length","hashtag","pos","interjection","onomatopoeia","polarity"]
+all_features = ["words","length","hashtag","pos","interjection","onomatopoeia","polarity","question"]
 metrics = {
-            "max_ent_with_all_features" : {},
-            "max_ent_with_only_pos": {},
-            "max_ent_with_only_polarity": {},
-            "max_ent_with_only_interjection": {},
-            "max_ent_without_onamatopoeia":{}
+            
           }
 def feature_set_generator(original_tweet,text,hashtags,users,length,label, include_list):
     features = {}
@@ -111,6 +107,13 @@ def feature_set_generator(original_tweet,text,hashtags,users,length,label, inclu
             if text in onomatopoeia:
                 onomatopoeia_count += 1
         features["onomatopoeia"] = onomatopoeia_count
+
+    if("question" in include_list):
+        question_count = 0
+        for text in words:
+            if "?" in text:
+                question_count += 1
+        features["question"] = question_count
 
     # Polarity of text - SUBSTANTIAL INCREASE IN ACCURACY
     if("polarity" in include_list):
@@ -193,8 +196,13 @@ metrics["max_ent_with_only_interjection"]=prepare_dict(max_ent_with_only_interje
 print_stats(a,ps,rs,fs,pns,rns,fns)
 
 a,ps,rs,fs,pns,rns,fns = me_classifier(["words","length","hashtag","pos","interjection","polarity"])
-max_ent_without_onamatopoeia = {}
-metrics["max_ent_without_onamatopoeia"]=prepare_dict(max_ent_without_onamatopoeia,a,ps,rs,fs,pns,rns,fns)
+max_ent_without_onamatopoeia_and_question = {}
+metrics["max_ent_without_onamatopoeia_and_question"]=prepare_dict(max_ent_without_onamatopoeia_and_question,a,ps,rs,fs,pns,rns,fns)
+print_stats(a,ps,rs,fs,pns,rns,fns)
+
+a,ps,rs,fs,pns,rns,fns = me_classifier(["question","length","interjection"])
+max_ent_with_question_length_interjection = {}
+metrics["max_ent_with_question_length_interjection"]=prepare_dict(max_ent_with_question_length_interjection,a,ps,rs,fs,pns,rns,fns)
 print_stats(a,ps,rs,fs,pns,rns,fns)
 
 json_data = json.dumps(metrics)
