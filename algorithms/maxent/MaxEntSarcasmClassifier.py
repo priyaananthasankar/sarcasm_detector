@@ -63,7 +63,7 @@ onomatopoeia = ["bang","bark", "bash", "beep", "biff", "blah", "blare", "blat", 
 
 all_features = ["words","length","hashtag","pos","interjection","onomatopoeia","polarity","question"]
 metrics = {
-            
+
           }
 def feature_set_generator(original_tweet,text,hashtags,users,length,label, include_list):
     features = {}
