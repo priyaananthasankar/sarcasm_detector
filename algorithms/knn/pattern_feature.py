@@ -36,7 +36,7 @@ def pattern_extraction(dir_name, sar):
                     words_dict[w] += 1
                     if max < words_dict[w]:
                         max = words_dict[w]
-    threshold = max / 10
+    threshold = max / 100
     if threshold < 1:
         threshold = 2
     #for "hlhl" kind of pattern
@@ -78,7 +78,7 @@ def feature_create(dir_name, sar_patterns, nonsar_patterns):
                 words_dict[w] += 1
                 if max < words_dict[w]:
                     max = words_dict[w]
-    threshold = max / 10
+    threshold = max / 100
     if threshold < 1:
         threshold = 2
     feature = []
@@ -116,10 +116,15 @@ def feature_create(dir_name, sar_patterns, nonsar_patterns):
 def pattern_feature(dir_name):
     #get all sarcastic pattern
     sar_patterns = pattern_extraction(dir_name, "S")
+    print ("----sar pattern count"+dir_name+str(len(sar_patterns)))
 
     # get all non sarcastic pattern
     nonsar_patterns = pattern_extraction(dir_name, "NS")
+    print ("non sar pattern count"+str(len(nonsar_patterns)))
+
     intersect = sar_patterns.intersection(nonsar_patterns)
+
+    print ("common pattern count" + str(len(intersect)))
 
     #ignoring unwanted patterns
     sar_patterns = sar_patterns.difference(intersect)
@@ -133,8 +138,6 @@ def pattern_feature(dir_name):
 
 
 
-
-pattern_feature(sys.argv[2])
 
 
 

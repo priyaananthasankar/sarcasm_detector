@@ -103,9 +103,6 @@ def main():
     x_seq, y_seq = makeseq(classify_dir)
     test_x_seq, test_y_seq = makeseq(test_dir)
 
-
-
-
     #knn
     neigh = KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
                metric_params=None, n_jobs=1, n_neighbors=3, p=2,
@@ -120,7 +117,7 @@ def main():
 
 
     metrics = {}
-    metrics["title"] = "knn_without_pattern_feature"
+    metrics["title"] = "knn_with_punction_and_word_feature_only"
     metrics["accuracy"] = accuracy_score(op_y_seq, test_y_seq)
     metrics["sarcasm_precision"] = prf[0][0]
     metrics["not_sarcasm_precision"] = prf[0][1]
