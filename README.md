@@ -1,2 +1,2 @@
 # sarcasm_detector
-A comparison of multiple machine learning algorithms used with natural language for sarcasm detection
+A trial of the same data with Facebook fastText word2vec.
